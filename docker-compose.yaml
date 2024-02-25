@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+
+  postgre:
+    image: postgres:latest
+    container_name: postgre_db
+    volumes:
+      - ./postgres-data/postgres:/var/lib/postgresql/data
+      - ./query/pg_up_1.sql:/docker-entrypoint-initdb.d/pg_up_1.sql
+      - ./query/pg_up_2.sql:/docker-entrypoint-initdb.d/pg_up_2.sql
+    environment:
+      POSTGRES_DB: "University"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "tohi231"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pUser -d University"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    ports: 
+      - 5432:5432
+
+  elastic:
+    image: elasticsearch:8.9.2
+    container_name: elastic_db
+    restart: unless-stopped
+    ports: 
+      - 9200:9200
+  
+  neo4j:
+    image: neo4j:latest
+    container_name: neo4j_db
+    ports: 
+      - "7474:7474"
+      - "7687:7687"
+    healthcheck:
+      test: wget http://localhost:7474 || exit 1
+      interval: 1s
+      timeout: 10s
+      retries: 20
+      start_period: 3s
+    environment:
+      NEO4J_AUTH: neo4j/tneo4j231
+
+  # redis:
+  #    image: redis:latest
+  #     container_name: redis_db
+  #     restart: unless-stopped
+  #     ports:
+  #       - 6379:6379
+  #     healthcheck:
+  #       test: ["CMD", "redis-cli", "ping"]
+  #       interval: 1s
+  #       timeout: 3s
+  #       retries: 5
+  #       start_period: 10s
+
+  app:
+    build: .
+    container_name: app
+    ports: 
+      - 5000:5000
+    depends_on:
+      postgre:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
