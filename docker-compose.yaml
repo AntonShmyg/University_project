@@ -6,16 +6,14 @@ services:
     image: postgres:latest
     container_name: postgre_db
     volumes:
-      - ./postgres-data/postgres:/var/lib/postgresql/data
       - ./query/pg_up_1.sql:/docker-entrypoint-initdb.d/pg_up_1.sql
-      - ./query/pg_up_2.sql:/docker-entrypoint-initdb.d/pg_up_2.sql
+      #- ./query/pg_up_2.sql:/docker-entrypoint-initdb.d/pg_up_2.sql
     environment:
       POSTGRES_DB: "University"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "tohi231"
-      PGDATA: "/var/lib/postgresql/data/pgdata"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pUser -d University"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d University"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -46,18 +44,18 @@ services:
     environment:
       NEO4J_AUTH: neo4j/tneo4j231
 
-  # redis:
-  #    image: redis:latest
-  #     container_name: redis_db
-  #     restart: unless-stopped
-  #     ports:
-  #       - 6379:6379
-  #     healthcheck:
-  #       test: ["CMD", "redis-cli", "ping"]
-  #       interval: 1s
-  #       timeout: 3s
-  #       retries: 5
-  #       start_period: 10s
+  redis:
+     image: redis:latest
+      container_name: redis_db
+      restart: unless-stopped
+      ports:
+        - 6379:6379
+      healthcheck:
+        test: ["CMD", "redis-cli", "ping"]
+        interval: 1s
+        timeout: 3s
+        retries: 5
+        start_period: 10s
 
   app:
     build: .
