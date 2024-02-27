@@ -55,6 +55,8 @@ services:
     container_name: app
     ports: 
       - 5000:5000
+    volumes:
+      - .:/app
     depends_on:
       postgre:
         condition: service_healthy
