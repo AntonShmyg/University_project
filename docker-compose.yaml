@@ -21,6 +21,8 @@ services:
     restart: unless-stopped
     ports: 
       - 5432:5432
+    networks:
+      - net
 
   elastic:
     image: elasticsearch:8.9.2
@@ -28,6 +30,8 @@ services:
     restart: unless-stopped
     ports: 
       - 9200:9200
+    networks:
+      - net
   
   neo4j:
     image: neo4j:latest
@@ -43,19 +47,8 @@ services:
       start_period: 3s
     environment:
       NEO4J_AUTH: neo4j/tneo4j231
-
-  redis:
-     image: redis:latest
-      container_name: redis_db
-      restart: unless-stopped
-      ports:
-        - 6379:6379
-      healthcheck:
-        test: ["CMD", "redis-cli", "ping"]
-        interval: 1s
-        timeout: 3s
-        retries: 5
-        start_period: 10s
+    networks:
+      - net
 
   app:
     build: .
@@ -67,3 +60,10 @@ services:
         condition: service_healthy
       neo4j:
         condition: service_healthy
+    networks:
+     - net
+
+networks:
+  net:
+    driver: bridge
+    
