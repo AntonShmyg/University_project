@@ -1,18 +1,16 @@
 
-
 CREATE TABLE lessons(
     id SERIAL PRIMARY KEY,
     object varchar(100) NOT NULL,
     date TIMESTAMP NOT NULL,
-    class INT NOT NULL,
-    eqiup varchar(60)
+    class INT NOT NULL
 );
 
 CREATE TABLE specialities(
     id SERIAL PRIMARY KEY,
     naming VARCHAR(60) NOT NULL,
     code VARCHAR(10) NOT NULL,
-    department_id INT NOT NULL
+    depart_id INT NOT NULL
 );
 
 CREATE TABLE groups(

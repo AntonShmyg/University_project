@@ -7,7 +7,7 @@ services:
     container_name: postgre_db
     volumes:
       - ./query/pg_up_1.sql:/docker-entrypoint-initdb.d/pg_up_1.sql
-      #- ./query/pg_up_2.sql:/docker-entrypoint-initdb.d/pg_up_2.sql
+      - ./query/pg_up_2.sql:/docker-entrypoint-initdb.d/pg_up_2.sql
     environment:
       POSTGRES_DB: "University"
       POSTGRES_USER: "postgres"
