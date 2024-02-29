@@ -27,6 +27,9 @@ services:
   elastic:
     image: elasticsearch:8.9.2
     container_name: elastic_db
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
     restart: unless-stopped
     ports: 
       - 9200:9200
