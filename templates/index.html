@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>University</title>
+        <meta charset="utf-8">
+    </head>
+    <style>
+        table, th, td {
+          border:1px solid black;
+        }
+    </style>
+    <body>
+        <br>
+        <form action="{{ url_for("index") }}" method="POST">
+            <div><label for="phrase">Введите фразу</label></div>
+            <div><input type="text", name="phrase"></div>
+            <br>
+
+            <div><label for="periodStart">Введите начальную дату</label></div>
+            <div><input type="text", name="periodStart"></div>
+            <br>
+
+            <div><label for="periodEnd">Введите конечную дату</label></div>
+            <div><input type="text", name="periodEnd"></div>
+            <br>
+
+            <div><button type="submit">Выполнить запрос</button></div>
+        </form>        
+
+        <div style="margin-top: 20px;">
+            <table cellpadding="4">                
+                <caption style="margin-bottom: 20px;">Результат</caption>
+                <br>
+                <tr>
+                    <th>Процент посещения</th>
+                    <th>ФИО</th>
+                    <th>Группа</th>
+                    <th>Направление</th>
+                    <th>Шифр специальности</th>
+                </tr>                
+                {% for student in response %}
+                <tr>
+                    <td>TO DO</td>
+                    <td>{{ student[0] }}</td>
+                    <td>{{ student[1] }}</td>
+                    <td>{{ student[2] }}</td>
+                    <td>{{ student[3] }}</td>
+                </tr>                    
+                {% endfor %}                       
+            </table>
+        </div>       
+    </body>
+</html>

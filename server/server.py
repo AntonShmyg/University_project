@@ -1,36 +1,45 @@
-from flask import Flask
+from flask import Flask, render_template, request
 from elasticsearch import Elasticsearch
-import psycopg2
+import configparser
 
 import elastic_search
 import postgre
 
-app=Flask(__name__)
-elastic = Elasticsearch('http://localhost:9200')
-pgsql = psycopg2.connect(dbname="University", 
-                         user="postgres", 
-                         password="tohi231", 
-                         host="localhost", 
-                         port="5432")
+app=Flask(__name__, template_folder='../templates')
+config = configparser.ConfigParser()
+config.read('server/config.ini')
+elastic = Elasticsearch(config['ElasticSearch']['host'])
 
 elastic_search.init(elastic)
 
-phrase = 'анализ данных' # получить из view
-periodStart = '2022' # получить из view
-periodEnd = '2022' # получить из view
+def execute_query(phrase, periodStart, periodEnd):
+    ids = elastic_search.get_ids(elastic, phrase)
 
-ids = elastic_search.get_ids(elastic, phrase)
+    # найти всех студентов, которые посещали занятия в заданном промежутке и материалы которых содержат заданный phrase
+    query = f"""SELECT students.full_name, groups.group_code, specialities.naming, specialities.code
+                FROM journal JOIN lessons ON lessons.id = journal.lesson_id, students
+                JOIN groups ON groups.id = students.group_id
+                JOIN specialities ON specialities.id = students.spec_id
+                WHERE journal.lesson_id IN {tuple(ids)} AND lessons.date BETWEEN '{periodStart}' AND '{periodEnd}'
+                GROUP BY students.id, groups.group_code, specialities.naming, specialities.code"""
+    result = postgre.execute(query)
 
-# найти всех студентов, которые посещали занятия, материалы которых содержат заданный phrase
-query = f"""SELECT DISTINCT students.full_name, groups.group_code, specialities.naming, specialities.code
-            FROM journal, students
-            JOIN groups ON groups.id = students.group_id
-            JOIN specialities ON specialities.id = students.spec_id
-            WHERE journal.lesson_id IN {tuple(ids)}"""
-result = postgre.execute(pgsql, query)
+    return result
 
-for student in result:
-    print(student)
+# анализ данных
+# 2023-10-21 10:40:00
+# 2023-10-22 10:40:00
+
+@app.route("/", methods = ["GET", "POST"])
+def index():
+    if request.method == "POST":
+        phrase = request.form.get("phrase")
+        periodStart = request.form.get("periodStart")
+        periodEnd = request.form.get("periodEnd")        
+        result = execute_query(phrase, periodStart, periodEnd)
+        return render_template("index.html", response=result)
+    
+    return render_template("index.html")
 
 if __name__ == '__main__':
     app.run()
