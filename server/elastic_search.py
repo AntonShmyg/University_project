@@ -75,4 +75,6 @@ def get_ids(es, text):
     for hit in result["hits"]["hits"]:
       ids.append(hit["_source"]['lesson_id'])
 
+    if len(ids) == 0:
+        return [-1, -1]
     return ids
