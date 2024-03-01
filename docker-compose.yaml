@@ -52,6 +52,17 @@ services:
       NEO4J_AUTH: neo4j/tneo4j231
     networks:
       - net
+  
+  redis:
+    image: redis:latest
+    container_name: redis_bd
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=tredis231
+      - REDIS_PORT=6379
+      - REDIS_DATABESES=2
 
   app:
     build: .
