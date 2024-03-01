@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 from elasticsearch import Elasticsearch
 import configparser
+import datetime
 
 import elastic_search
 import postgre
@@ -26,18 +27,23 @@ def execute_query(phrase, periodStart, periodEnd):
 
     return result
 
-# анализ данных
-# 2023-10-21 10:40:00
-# 2023-10-22 10:40:00
+def is_valid_datetime(datetime_text):
+    try:
+        datetime.datetime.fromisoformat(datetime_text)
+        return True
+    except ValueError:
+        return False
 
 @app.route("/", methods = ["GET", "POST"])
 def index():
     if request.method == "POST":
         phrase = request.form.get("phrase")
         periodStart = request.form.get("periodStart")
-        periodEnd = request.form.get("periodEnd")        
-        result = execute_query(phrase, periodStart, periodEnd)
-        return render_template("index.html", response=result)
+        periodEnd = request.form.get("periodEnd")
+
+        if phrase and is_valid_datetime(periodStart) and is_valid_datetime(periodEnd):        
+            result = execute_query(phrase, periodStart, periodEnd)
+            return render_template("index.html", response=result)
     
     return render_template("index.html")
 
