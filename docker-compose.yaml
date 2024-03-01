@@ -64,6 +64,15 @@ services:
       - REDIS_PORT=6379
       - REDIS_DATABESES=2
 
+  mongodb:
+    image: mongo:latest
+    container_name: mongo_db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - 27017:27017
+
   app:
     build: .
     container_name: app

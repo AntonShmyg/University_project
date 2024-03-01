@@ -5,6 +5,8 @@ import datetime
 
 import elastic_search
 import postgre
+import redis_db
+import mongo
 
 app=Flask(__name__, template_folder='../templates')
 config = configparser.ConfigParser()
@@ -44,7 +46,7 @@ def index():
         if phrase and is_valid_datetime(periodStart) and is_valid_datetime(periodEnd):        
             result = execute_query(phrase, periodStart, periodEnd)
             return render_template("index.html", response=result)
-    
+        
     return render_template("index.html")
 
 if __name__ == '__main__':
